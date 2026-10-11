@@ -190,12 +190,14 @@ check(np.abs(r1[..., :3] - r3[..., :3]).mean() < 1.5, ".ai export of grouped art
 # a real file: groups from the native data, same pixels
 best = 0
 src = None
-for name in fixtures("pdf"):
-    path = fixture(name)
+for path in [fixture(n) for n in fixtures("pdf")] or [sample_or_fixture("pdf")]:
     n = sum(1 for _, _, x in import_file(path).walk() if isinstance(x, GroupItem))
     if n > best:
         best, src = n, path
-check(best >= 1, "a real .ai comes in with its groups (%d)" % best)
+if fixtures("pdf"):
+    check(best >= 1, "a real .ai comes in with its groups (%d)" % best)
+else:
+    print("skip (no private Illustrator files here): groups from a real .ai")
 if src:
     w.open_path(src, ask=False)
 pump(5)

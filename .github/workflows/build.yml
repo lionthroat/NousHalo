@@ -1,0 +1,275 @@
+# Builds Nous Halo for Windows (installer), macOS (Apple Silicon + Intel) and
+# Linux (.deb for Mint/Ubuntu/Debian).
+#
+# Runs when you push a version tag, or when you press "Run workflow" on the
+# repo's Actions tab. Not on every push: Mac minutes are expensive.
+#
+#   1. put the new version in the VERSION file (e.g. 0.2.0) and commit
+#   2. git tag v0.2.0 && git push && git push --tags
+#
+# A tag run also publishes a GitHub Release with NousHalo-Setup.exe, the two
+# Mac zips and NousHalo-linux-amd64.deb. "Run workflow" only builds (files under Artifacts).
+#
+# Several tests use private Illustrator files that aren't in the repository;
+# without them they test with tests/ci-sample.ai (made by make_showcase.py)
+# or skip the real-file checks.
+
+name: Build
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install
+        run: |
+          python -m venv .venv
+          .venv\Scripts\python.exe -m pip install -r requirements.txt
+          choco install innosetup -y --no-progress
+
+      - name: Test
+        # a test prints "FAILED: n" when a check fails, or crashes outright
+        run: |
+          foreach ($t in "test_smoke", "test_features", "test_groups", "test_guides", "test_layers_panel", "test_trace", "test_aiexport") {
+            $o = .venv\Scripts\python.exe tests\$t.py 2>&1 | Out-String
+            Write-Host $o
+            if ($LASTEXITCODE -ne 0 -or $o -match "FAILED:") { throw "$t failed" }
+          }
+        env:
+          QT_QPA_PLATFORM: offscreen
+          QT_QPA_FONTDIR: C:/Windows/Fonts
+          PYTHONIOENCODING: utf-8
+
+      - name: Build app + installer
+        run: powershell -ExecutionPolicy Bypass -File build.ps1
+
+      - name: Check the installer (install, open a file, uninstall)
+        run: |
+          $ErrorActionPreference = "Stop"
+          if (-not (Test-Path installer-output\NousHalo-Setup.exe)) { throw "no installer was built" }
+          $app = "$env:LOCALAPPDATA\Programs\Nous Halo"
+          Start-Process installer-output\NousHalo-Setup.exe -Wait -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/TASKS=desktopicon"
+          foreach ($p in "$app\NousHalo.exe", "$app\_internal", "$app\_internal\assets\hand.png",
+                         "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Nous Halo.lnk",
+                         "$env:USERPROFILE\Desktop\Nous Halo.lnk") {
+            if (-not (Test-Path $p)) { throw "missing after install: $p" }
+          }
+          $halo = (Get-ItemProperty "HKCU:\Software\Classes\.halo")."(default)"
+          if ($halo -ne "NousHalo.Document") { throw ".halo isn't Nous Halo's: $halo" }
+          $owp = Get-ItemProperty "HKCU:\Software\Classes\.ai\OpenWithProgids"
+          if (-not ($owp.PSObject.Properties.Name -contains "NousHalo.Artwork")) { throw "not in Open with for .ai" }
+          $cmd = (Get-ItemProperty "HKCU:\Software\Classes\NousHalo.Document\shell\open\command")."(default)"
+          if ($cmd -ne "`"$app\NousHalo.exe`" `"%1`"") { throw "bad open command: $cmd" }
+          if (-not (Get-ItemProperty "HKCU:\Software\RegisteredApplications")."Nous Halo") { throw "not in Default apps" }
+          $ver = (Get-Item "$app\NousHalo.exe").VersionInfo
+          Write-Host "Installed: $($ver.FileDescription) $($ver.FileVersion)"
+
+          $proc = Start-Process "$app\NousHalo.exe" -ArgumentList "`"$PWD\tests\ci-sample.ai`"" -PassThru
+          Start-Sleep 12
+          if ($proc.HasExited) { throw "Nous Halo exited right after opening a file (code $($proc.ExitCode))" }
+          Write-Host "Running after 12s, window: '$((Get-Process -Id $proc.Id).MainWindowTitle)'"
+          Stop-Process -Id $proc.Id -Force
+          Start-Sleep 2
+
+          Start-Process "$app\unins000.exe" -Wait -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART"
+          for ($i = 0; $i -lt 30 -and (Test-Path "$app\NousHalo.exe"); $i++) { Start-Sleep 1 }
+          foreach ($p in "$app\NousHalo.exe", "$env:USERPROFILE\Desktop\Nous Halo.lnk",
+                         "HKCU:\Software\Classes\NousHalo.Document", "HKCU:\Software\Classes\NousHalo.Artwork",
+                         "HKCU:\Software\Nous Halo") {
+            if (Test-Path $p) { throw "left behind after uninstall: $p" }
+          }
+          if ((Get-ItemProperty "HKCU:\Software\RegisteredApplications" -ErrorAction SilentlyContinue)."Nous Halo") { throw "Default apps entry left behind" }
+          Write-Host "Install, launch and uninstall all OK"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NousHalo-windows
+          path: installer-output/NousHalo-Setup.exe
+          retention-days: 30
+
+  linux:
+    # Built on an older Ubuntu so the package runs on Linux Mint 21+ / Ubuntu 22.04+
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
+            libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 \
+            libxkbcommon-x11-0 libegl1 libgl1 xvfb xdotool desktop-file-utils fonts-dejavu-core
+          python -m venv .venv
+          .venv/bin/python -m pip install -r requirements.txt
+
+      - name: Test
+        run: |
+          set -o pipefail
+          for t in test_smoke test_features test_groups test_guides test_trace; do
+            .venv/bin/python tests/$t.py | tee -a test-output.txt
+          done
+          ! grep -q "FAILED:" test-output.txt
+        env:
+          QT_QPA_PLATFORM: offscreen
+          PYTHONIOENCODING: utf-8
+
+      - name: Build .deb
+        run: |
+          bash build_linux.sh
+          mv nous-halo_*_amd64.deb NousHalo-linux-amd64.deb
+
+      - name: Check the .deb (install, open a file, uninstall)
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -qq ./NousHalo-linux-amd64.deb
+          dpkg -s nous-halo | grep -E "^(Version|Installed-Size):"
+          test -x /usr/bin/nous-halo
+          desktop-file-validate /usr/share/applications/nous-halo.desktop
+          grep "application/x-nous-halo=.*nous-halo.desktop" /usr/share/applications/mimeinfo.cache
+          test -f /usr/share/mime/packages/nous-halo.xml
+          test -f /usr/share/icons/hicolor/256x256/apps/nous-halo.png
+
+          xvfb-run -a bash tests/linux_launch_check.sh tests/ci-sample.ai
+
+          sudo apt-get remove -y -qq nous-halo
+          test ! -e /usr/bin/nous-halo && test ! -e /opt/nous-halo
+          ! grep -q "nous-halo.desktop" /usr/share/applications/mimeinfo.cache
+          echo "Install, launch and uninstall all OK"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NousHalo-linux
+          path: NousHalo-linux-amd64.deb
+          retention-days: 30
+
+  linux-clean:
+    # Installs the .deb on bare Linux Mint / LMDE systems: apt must pull in every
+    # system library the app uses (the package only bundles Python, Qt and its own)
+    needs: linux
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [mint21.3-amd64, mint22.3-amd64, lmde7-amd64]
+    container: linuxmintd/${{ matrix.image }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: NousHalo-linux
+
+      - name: Install, open a file, uninstall
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          set -euo pipefail
+          apt-get update -qq
+          apt-get install -y -qq ./NousHalo-linux-amd64.deb xvfb xauth xdotool fonts-dejavu-core > /dev/null
+          dpkg -s nous-halo | grep -E "^(Version|Installed-Size):"
+          missing=$(find /opt/nous-halo -type f \( -name "*.so*" -o -name NousHalo \) -print0 |
+            xargs -0 ldd 2>/dev/null | awk '/:$/ { f = $0 } /not found/ { print f, $0 }' || true)
+          [ -z "$missing" ] || { echo "$missing"; exit 1; }
+          xvfb-run -a bash tests/linux_launch_check.sh tests/ci-sample.ai
+          apt-get remove -y -qq nous-halo > /dev/null
+          test ! -e /opt/nous-halo
+
+  mac:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15          # Apple Silicon (M1 and newer)
+            arch: apple-silicon
+          - runner: macos-15-intel    # older Intel Macs
+            arch: intel
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install
+        run: python -m pip install -r requirements.txt pillow
+
+      - name: Test
+        run: |
+          set -o pipefail
+          for t in test_smoke test_features test_groups test_trace; do
+            python tests/$t.py | tee -a test-output.txt
+          done
+          ! grep -q "FAILED:" test-output.txt
+        env:
+          QT_QPA_PLATFORM: offscreen
+          PYTHONIOENCODING: utf-8
+
+      - name: Build
+        run: python -m PyInstaller --noconfirm --clean NousHalo-mac.spec
+
+      - name: Check the app starts
+        run: |
+          "dist/Nous Halo.app/Contents/MacOS/NousHalo" "$PWD/tests/ci-sample.ai" &
+          pid=$!
+          sleep 10
+          kill -0 $pid && echo "still running after 10s" && kill $pid
+
+      - name: Zip
+        # ditto keeps the app's symlinks and signature intact (a plain zip breaks them)
+        run: ditto -c -k --keepParent "dist/Nous Halo.app" "NousHalo-mac-${{ matrix.arch }}.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NousHalo-mac-${{ matrix.arch }}
+          path: NousHalo-mac-${{ matrix.arch }}.zip
+          retention-days: 30
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, mac, linux, linux-clean]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tag matches VERSION file
+        run: |
+          want="$(tr -d '[:space:]' < VERSION)"
+          if [ "${GITHUB_REF_NAME#v}" != "$want" ]; then
+            echo "Tag $GITHUB_REF_NAME doesn't match VERSION ($want)"; exit 1
+          fi
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-files
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: Nous Halo ${{ github.ref_name }}
+          files: release-files/*
+          body: |
+            **Windows:** download `NousHalo-Setup.exe` and open it.
+            **Mac:** `NousHalo-mac-apple-silicon.zip` for M1 and newer, `NousHalo-mac-intel.zip` for Intel Macs.
+            **Linux (Mint, Ubuntu, Debian):** download `NousHalo-linux-amd64.deb` and double-click it, or `sudo apt install ./NousHalo-linux-amd64.deb`.
+
+            Step-by-step instructions (including the one-time security warnings): https://noushalo.lionthroat.com

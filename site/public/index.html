@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nous Halo — Download</title>
+<meta name="description" content="Nous Halo is a free vector drawing program for Windows, Mac and Linux that opens Illustrator files, puts hue shifting front and centre, locks artwork to a palette, traces scans and animates with a frame timeline.">
+<link rel="icon" href="/favicon.ico" sizes="64x64">
+<link rel="icon" type="image/png" href="/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<style>
+:root {
+  --bg: #f6f4ef;
+  --card: #ffffff;
+  --ink: #1f2328;
+  --muted: #5b6270;
+  --line: #e2ddd3;
+  --accent: #3f6a9c;
+  --accent-ink: #ffffff;
+  --accent-soft: #e4ecf5;
+  --focus: #1a73e8;
+  --tip-bg: #fff7dc;
+  --tip-line: #ecd889;
+  --code-bg: #f1efe9;
+  --shadow: 0 1px 2px rgba(0,0,0,.05), 0 6px 20px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17181b;
+    --card: #212327;
+    --ink: #eceef1;
+    --muted: #a3a9b4;
+    --line: #34373d;
+    --accent: #88c0d0;
+    --accent-ink: #1d232d;
+    --accent-soft: #24303d;
+    --focus: #7cb2ff;
+    --tip-bg: #2e2a1a;
+    --tip-line: #5c5126;
+    --code-bg: #2b2d32;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #17181b; --card: #212327; --ink: #eceef1; --muted: #a3a9b4; --line: #34373d;
+  --accent: #88c0d0; --accent-ink: #1d232d; --accent-soft: #24303d; --focus: #7cb2ff;
+  --tip-bg: #2e2a1a; --tip-line: #5c5126; --code-bg: #2b2d32; --shadow: none;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 19px/1.55 "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+}
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+
+header { padding: 48px 0 20px; text-align: center; }
+header img { width: 96px; height: 96px; }
+h1 { font-size: 2.4rem; margin: 8px 0 4px; letter-spacing: -.01em; }
+.tagline { font-size: 1.2rem; color: var(--muted); margin: 0 auto; max-width: 34em; }
+
+.phone-note {
+  display: none;
+  background: var(--tip-bg); border: 2px solid var(--tip-line);
+  border-radius: 14px; padding: 16px 18px; margin: 8px 0 20px; font-size: 1.05rem;
+}
+.phone-note strong { display: block; font-size: 1.15rem; margin-bottom: 4px; }
+body.is-phone .phone-note { display: block; }
+
+.tabs { display: flex; gap: 10px; justify-content: center; margin: 22px 0 6px; flex-wrap: wrap; }
+.tab {
+  font: inherit; font-weight: 600; font-size: 1.05rem;
+  padding: 12px 22px; border-radius: 999px; cursor: pointer;
+  border: 2px solid var(--line); background: var(--card); color: var(--ink);
+}
+.tab[aria-selected="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.tabs-label { text-align: center; color: var(--muted); font-size: .95rem; margin-top: 18px; }
+
+.panel[hidden] { display: none; }
+.steps { list-style: none; padding: 0; margin: 18px 0 0; counter-reset: step; }
+.step {
+  counter-increment: step;
+  background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 22px 22px 22px 76px; margin: 0 0 16px; position: relative;
+}
+.step::before {
+  content: counter(step);
+  position: absolute; left: 20px; top: 20px;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-ink);
+  font-weight: 700; font-size: 1.2rem; display: grid; place-items: center;
+}
+.step h2 { font-size: 1.3rem; margin: 4px 0 8px; line-height: 1.3; }
+.step p { margin: 8px 0; }
+.step .small { color: var(--muted); font-size: .95rem; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--accent); color: var(--accent-ink); text-decoration: none;
+  font-weight: 700; font-size: 1.2rem; padding: 16px 28px; border-radius: 14px;
+  margin: 8px 8px 4px 0;
+}
+.btn:hover { filter: brightness(1.07); }
+.btn svg { width: 24px; height: 24px; flex: none; }
+.btn.secondary { background: var(--card); color: var(--ink); border: 2px solid var(--line); }
+.meta { color: var(--muted); font-size: .95rem; }
+
+.key {
+  display: inline-block; font: 600 .9em/1 "Segoe UI", -apple-system, sans-serif;
+  padding: 4px 8px; border: 1px solid var(--line); border-bottom-width: 3px;
+  border-radius: 7px; background: var(--card); white-space: nowrap;
+}
+.press { font-weight: 700; }
+.path { font-weight: 600; }
+.path .arrow { color: var(--muted); font-weight: 400; padding: 0 2px; }
+
+.tip {
+  background: var(--tip-bg); border: 1px solid var(--tip-line);
+  border-radius: 12px; padding: 12px 14px; margin-top: 12px; font-size: .97rem;
+}
+code, .cmd {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace; font-size: .9em;
+  background: var(--code-bg); border-radius: 6px; padding: 2px 6px;
+}
+.cmd-row { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; margin-top: 8px; }
+.cmd-row .cmd { padding: 10px 12px; flex: 1 1 260px; word-break: break-all; }
+.copy-btn {
+  font: inherit; font-size: .95rem; font-weight: 600; cursor: pointer;
+  border: 2px solid var(--line); background: var(--card); color: var(--ink);
+  border-radius: 10px; padding: 8px 14px;
+}
+
+/* Simplified drawings of the warnings people will see */
+.shot { margin: 14px 0 6px; max-width: 520px; }
+.shot figcaption { color: var(--muted); font-size: .88rem; margin-top: 6px; }
+.target { position: relative; }
+.target::after {
+  content: ""; position: absolute; inset: -6px; border-radius: 10px;
+  border: 3px solid #ffb300; box-shadow: 0 0 0 4px rgba(255,179,0,.25);
+  animation: pulse 1.6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes pulse { 50% { box-shadow: 0 0 0 9px rgba(255,179,0,.08); } }
+@media (prefers-reduced-motion: reduce) { .target::after { animation: none; } }
+
+.ss {
+  background: #0b5aa6; color: #fff; border-radius: 6px; padding: 18px 20px 14px;
+  font-family: "Segoe UI", sans-serif; font-size: 15px; line-height: 1.45;
+}
+.ss .ss-title { font-size: 24px; font-weight: 300; margin: 0 0 10px; }
+.ss u { cursor: default; }
+.ss .ss-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+.ss .ss-btn { border: 2px solid #fff; padding: 5px 18px; font-size: 14px; }
+.ss .ss-btn.solid { background: #fff; color: #0b5aa6; }
+.ss .ss-faint { opacity: .85; font-size: 13px; }
+
+.dl-bar {
+  background: #fff; color: #1b1b1b; border: 1px solid #d5d5d5; border-radius: 8px;
+  padding: 12px 14px; font: 14px/1.4 "Segoe UI", sans-serif;
+  box-shadow: 0 4px 14px rgba(0,0,0,.12);
+}
+.dl-bar .dl-line { display: flex; align-items: center; gap: 10px; }
+.dl-bar .warn { color: #b25c00; font-size: 18px; }
+.dl-bar .dl-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
+.dl-bar .dl-btn { border: 1px solid #c7c7c7; border-radius: 4px; padding: 3px 12px; background: #fafafa; }
+
+.mac-alert {
+  background: #ececec; color: #1d1d1f; border-radius: 14px; padding: 20px 20px 16px;
+  max-width: 300px; text-align: center; font: 13px/1.4 -apple-system, "Helvetica Neue", sans-serif;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+.mac-alert .icon { width: 56px; height: 56px; margin: 0 auto 8px; display: block; }
+.mac-alert b { display: block; font-size: 14px; margin-bottom: 6px; }
+.mac-alert .mac-btn {
+  display: block; border-radius: 7px; padding: 6px; margin-top: 8px; background: #fff;
+  border: 1px solid #d0d0d0;
+}
+.mac-alert .mac-btn.blue { background: #0a84ff; color: #fff; border-color: #0a84ff; }
+.mac-settings {
+  background: #f5f5f7; color: #1d1d1f; border-radius: 12px; padding: 16px;
+  font: 13px/1.45 -apple-system, "Helvetica Neue", sans-serif; border: 1px solid #ddd;
+}
+.mac-settings .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.mac-settings .mac-btn { background: #fff; border: 1px solid #ccc; border-radius: 6px; padding: 3px 12px; white-space: nowrap; }
+
+.hero { margin: 8px auto 6px; max-width: 860px; }
+.hero img { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+.hero figcaption { text-align: center; color: var(--muted); font-size: .92rem; margin-top: 8px; }
+.uses { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 14px; }
+.use { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; box-shadow: var(--shadow); }
+.use h3 { margin: 0 0 6px; font-size: 1.08rem; }
+.use p { margin: 0; color: var(--muted); font-size: .97rem; }
+
+section.more { margin: 44px 0 0; }
+section.more h2 { font-size: 1.6rem; margin: 0 0 4px; }
+details { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; margin: 10px 0; }
+summary { cursor: pointer; font-weight: 600; }
+details p { margin: 10px 0 2px; }
+
+footer { margin: 50px 0 40px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: .95rem; text-align: center; }
+footer a { color: inherit; }
+
+@media (max-width: 560px) {
+  body { font-size: 18px; }
+  h1 { font-size: 2rem; }
+  .step { padding: 70px 18px 18px; }
+  .step::before { left: 18px; top: 18px; }
+  .btn { width: 100%; justify-content: center; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <img src="/icon-192.png" alt="" width="96" height="96">
+  <h1>Nous Halo</h1>
+  <p class="tagline">A free drawing program for leaving Illustrator behind. It opens your .ai files with their layers, groups and text, puts hue shifting front and centre, keeps a piece true to its palette, and animates. No subscription, ever.</p>
+</header>
+
+<figure class="hero">
+  <img src="/screenshot.png" width="1440" height="940"
+       alt="Nous Halo showing a dusk landscape: purple sky bands, a setting sun, mountains and pine trees over a lake. On the right, the Halo colour wheel shows every colour in the picture as a dot; below it the Layers panel with thumbnails, and along the bottom a timeline of five animation frames.">
+  <figcaption>Every colour in the piece sits on the Halo wheel: drag one to change it, or spin them all.</figcaption>
+</figure>
+
+<div class="phone-note" role="note">
+  <strong>You're on a phone or tablet.</strong>
+  Nous Halo is a program for a Windows, Mac or Linux computer. Open this page on your computer to download it: the address is <b>noushalo.lionthroat.com</b>
+</div>
+
+<p class="tabs-label" id="tabs-label">Which computer are you using?</p>
+<div class="tabs" role="tablist" aria-labelledby="tabs-label">
+  <button class="tab" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows computer</button>
+  <button class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac</button>
+  <button class="tab" role="tab" id="tab-linux" aria-controls="panel-linux" aria-selected="false" tabindex="-1">Linux</button>
+</div>
+
+<!-- ===================== WINDOWS ===================== -->
+<div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
+<ol class="steps">
+
+  <li class="step">
+    <h2>Download the installer</h2>
+    <a class="btn" href="https://github.com/lionthroat/NousHalo/releases/latest/download/NousHalo-Setup.exe">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M6 10l6 6 6-6M4 20h16"/></svg>
+      Download for Windows
+    </a>
+    <p class="meta" data-release-meta="NousHalo-Setup.exe">NousHalo-Setup.exe · for Windows 10 and 11</p>
+  </li>
+
+  <li class="step">
+    <h2>If your browser double-checks, choose “Keep”</h2>
+    <p>New programs get a warning like this until lots of people have downloaded them. It's safe to keep.</p>
+    <figure class="shot">
+      <div class="dl-bar" aria-hidden="true">
+        <div class="dl-line"><span class="warn">⚠</span><span><b>NousHalo-Setup.exe</b> isn't commonly downloaded. Make sure you trust it before you open it.</span></div>
+        <div class="dl-actions"><span class="dl-btn">Delete</span><span class="dl-btn target">···</span></div>
+      </div>
+      <figcaption>A simplified drawing of the warning in Microsoft Edge.</figcaption>
+    </figure>
+    <p>In <b>Microsoft Edge</b>: click the <span class="press">···</span> button, then <span class="press">Keep</span>. If it asks again, click <span class="press">Show more</span>, then <span class="press">Keep anyway</span>.</p>
+    <p class="small">In Chrome or Firefox the button just says <b>Keep</b>. No warning at all? Even better, go to step 3.</p>
+  </li>
+
+  <li class="step">
+    <h2>Open it, then click “More info” and “Run anyway”</h2>
+    <p>Open the downloaded file (click it in your browser's downloads, or find it in your <b>Downloads</b> folder). A blue box will appear the first time:</p>
+    <figure class="shot">
+      <div class="ss" aria-hidden="true">
+        <p class="ss-title">Windows protected your PC</p>
+        <div>Microsoft Defender SmartScreen prevented an unrecognized app from starting. Running this app might put your PC at risk.</div>
+        <div style="margin-top:8px"><u class="target">More info</u></div>
+        <div class="ss-row"><span class="ss-btn">Don't run</span></div>
+      </div>
+      <figcaption>Click the small <b>More info</b> link first…</figcaption>
+    </figure>
+    <figure class="shot">
+      <div class="ss" aria-hidden="true">
+        <p class="ss-title">Windows protected your PC</p>
+        <div class="ss-faint">App: NousHalo-Setup.exe<br>Publisher: Unknown publisher</div>
+        <div class="ss-row"><span class="ss-btn target">Run anyway</span><span class="ss-btn">Don't run</span></div>
+      </div>
+      <figcaption>…then <b>Run anyway</b> appears. Click it.</figcaption>
+    </figure>
+    <p class="small">“Unknown publisher” only means Nous Halo isn't paying Microsoft for a certificate. You'll only see this once.</p>
+  </li>
+
+  <li class="step">
+    <h2>Click through the installer</h2>
+    <p>Click <span class="press">Next</span>, then <span class="press">Install</span>, then <span class="press">Finish</span>. Nous Halo opens, and you'll find it on your desktop and in the Start menu.</p>
+    <p class="small">No password or admin rights needed.</p>
+  </li>
+
+  <li class="step">
+    <h2>Optional: open Illustrator files with it</h2>
+    <p>Your own <b>.halo</b> files open in Nous Halo with a double-click. It never takes over .ai files from Illustrator. To open one in Halo:</p>
+    <p class="path"><span>Right-click an .ai file</span> <span class="arrow">→</span> <span>Open with</span> <span class="arrow">→</span> <span>Nous Halo</span></p>
+    <p class="small">Want every .ai to open in Halo? Choose <b>Choose another app</b> → <b>Nous Halo</b> → <b>Always</b> instead.</p>
+  </li>
+</ol>
+</div>
+
+<!-- ===================== MAC ===================== -->
+<div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac" hidden>
+<ol class="steps">
+
+  <li class="step">
+    <h2>Download the version for your Mac</h2>
+    <p>Not sure which one? Click the <b>Apple menu</b> (the apple logo in the top-left corner of the screen), then <b>About This Mac</b>. If it says <b>Chip: Apple M1</b> (or M2, M3, M4…), pick the first button. If it says <b>Processor: … Intel</b>, pick the second.</p>
+    <a class="btn" href="https://github.com/lionthroat/NousHalo/releases/latest/download/NousHalo-mac-apple-silicon.zip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M6 10l6 6 6-6M4 20h16"/></svg>
+      Mac with Apple chip
+    </a>
+    <a class="btn secondary" href="https://github.com/lionthroat/NousHalo/releases/latest/download/NousHalo-mac-intel.zip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M6 10l6 6 6-6M4 20h16"/></svg>
+      Mac with Intel processor
+    </a>
+    <p class="meta" data-release-meta="NousHalo-mac-apple-silicon.zip">For macOS 12 Monterey or newer</p>
+  </li>
+
+  <li class="step">
+    <h2>Move it into Applications</h2>
+    <p>Open your <b>Downloads</b> folder. If you see a <b>.zip</b> file, double-click it. Then drag <b>Nous Halo</b> into the <b>Applications</b> folder in the Finder sidebar.</p>
+  </li>
+
+  <li class="step">
+    <h2>Open it once, and click “Done”</h2>
+    <p>Double-click Nous Halo in Applications. The first time, your Mac will stop it with a message like this:</p>
+    <figure class="shot">
+      <div class="mac-alert" aria-hidden="true">
+        <img class="icon" src="/icon-192.png" alt="">
+        <b>“Nous Halo” Not Opened</b>
+        Apple could not verify “Nous Halo” is free of malware that may harm your Mac or compromise your privacy.
+        <span class="mac-btn blue target">Done</span>
+        <span class="mac-btn">Move to Trash</span>
+      </div>
+      <figcaption>A simplified drawing. Click <b>Done</b>, not “Move to Trash”.</figcaption>
+    </figure>
+    <p class="small">This only means Nous Halo isn't paying Apple for a certificate.</p>
+  </li>
+
+  <li class="step">
+    <h2>Allow it in System Settings</h2>
+    <p class="path"><span>Apple menu</span> <span class="arrow">→</span> <span>System Settings</span> <span class="arrow">→</span> <span>Privacy &amp; Security</span></p>
+    <p>Scroll down until you see Nous Halo, and click <span class="press">Open Anyway</span>:</p>
+    <figure class="shot">
+      <div class="mac-settings" aria-hidden="true">
+        <div class="row"><span>“Nous Halo” was blocked to protect your Mac.</span><span class="mac-btn target">Open Anyway</span></div>
+      </div>
+      <figcaption>A simplified drawing of that part of Privacy &amp; Security.</figcaption>
+    </figure>
+    <p>Your Mac asks for your password or Touch ID, then once more whether to open it: click <span class="press">Open Anyway</span>. That's the last time you'll be asked.</p>
+    <div class="tip">
+      If your Mac ever says Nous Halo “is damaged and can't be opened”, open the <b>Terminal</b> app, paste this line, and press Return:
+      <div class="cmd-row"><code class="cmd" id="xattr-cmd">xattr -cr "/Applications/Nous Halo.app"</code><button class="copy-btn" type="button" data-copy="xattr-cmd">Copy</button></div>
+    </div>
+  </li>
+
+  <li class="step">
+    <h2>Optional: open Illustrator files with it</h2>
+    <p class="path"><span>Right-click an .ai file</span> <span class="arrow">→</span> <span>Open With</span> <span class="arrow">→</span> <span>Nous Halo</span></p>
+    <p class="small">To make it the default for every .ai: click one once, <b>File</b> → <b>Get Info</b>, choose Nous Halo under “Open with”, then <b>Change All…</b></p>
+  </li>
+</ol>
+</div>
+
+<!-- ===================== LINUX ===================== -->
+<div class="panel" id="panel-linux" role="tabpanel" aria-labelledby="tab-linux" hidden>
+<ol class="steps">
+
+  <li class="step">
+    <h2>Download the package</h2>
+    <a class="btn" href="https://github.com/lionthroat/NousHalo/releases/latest/download/NousHalo-linux-amd64.deb">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M6 10l6 6 6-6M4 20h16"/></svg>
+      Download for Linux
+    </a>
+    <p class="meta" data-release-meta="NousHalo-linux-amd64.deb">.deb for Linux Mint 21+, Ubuntu 22.04+ and Debian 12+ (64-bit)</p>
+  </li>
+
+  <li class="step">
+    <h2>Install it</h2>
+    <p>Double-click the downloaded file in your <b>Downloads</b> folder, click <span class="press">Install Package</span>, and type your password. Nous Halo appears in your menu under <b>Graphics</b>.</p>
+    <p class="small">Or in a terminal, from your Downloads folder:</p>
+    <div class="cmd-row"><code class="cmd" id="apt-cmd">sudo apt install ./NousHalo-linux-amd64.deb</code><button class="copy-btn" type="button" data-copy="apt-cmd">Copy</button></div>
+  </li>
+
+  <li class="step">
+    <h2>Optional: open Illustrator files with it</h2>
+    <p class="path"><span>Right-click an .ai file</span> <span class="arrow">→</span> <span>Open With</span> <span class="arrow">→</span> <span>Nous Halo</span></p>
+    <p class="small">To make it the default: <b>Properties</b> → <b>Open With</b> → Nous Halo → <b>Set as default</b> (in Linux Mint's file manager). .halo files open in it already.</p>
+  </li>
+</ol>
+</div>
+
+<!-- ===================== USING IT ===================== -->
+<section class="more" aria-labelledby="using">
+  <h2 id="using">Using Nous Halo</h2>
+  <p>Open an Illustrator file with <span class="path">File <span class="arrow">→</span> Open</span> (<span class="key"><span data-mod>Ctrl</span>+O</span>). It comes in with its artboards, layers, groups, text and images; save it as a <b>.halo</b> file to keep working on it, or export it again as .ai, SVG or PNG.</p>
+  <div class="uses">
+    <div class="use"><h3>Spin the palette</h3><p>In the <b>Halo</b> panel, every colour in the piece is a dot. Drag one to change that colour; drag empty space to turn them all around the wheel.</p></div>
+    <div class="use"><h3>Lock to a palette</h3><p>Choose a palette and tick <b>Lock piece to this palette</b>. Colour pickers only offer its colours, and <b>Conform</b> snaps everything to it, images included.</p></div>
+    <div class="use"><h3>Build palettes</h3><p>In <b>Palettes</b>, make one from the document, an image or a colour harmony. Brings in Adobe .ase swatches, too.</p></div>
+    <div class="use"><h3>Animate</h3><p>In the <b>Timeline</b>, add frames, hide or nudge layers in each, and <b>Tween</b> the in-betweens. Export PNG frames or a sprite sheet.</p></div>
+    <div class="use"><h3>Trace a scan</h3><p>Place a scanned drawing, select it, then <span class="path">Object <span class="arrow">→</span> Image Trace</span> turns its ink into vector shapes.</p></div>
+    <div class="use"><h3>Groups and guides</h3><p><span class="key"><span data-mod>Ctrl</span>+G</span> groups; double-click a group to work inside it. <span class="key"><span data-mod>Ctrl</span>+R</span> shows rulers to drag guides from.</p></div>
+  </div>
+  <p class="meta"><span class="key">F1</span> in the program lists every shortcut.</p>
+</section>
+
+<section class="more" aria-labelledby="questions">
+  <h2 id="questions">Questions</h2>
+  <details>
+    <summary>Why does my computer warn me about it?</summary>
+    <p>Microsoft and Apple charge yearly fees for the certificates that make those warnings go away. Nous Halo is free and made by one person, so it skips them. The warnings appear once; after that it opens like any other program.</p>
+  </details>
+  <details>
+    <summary>Is it really free?</summary>
+    <p>Yes, no trial, no subscription, no ads. It's open source: anyone can read exactly what it does on <a href="https://github.com/lionthroat/NousHalo">GitHub</a>.</p>
+  </details>
+  <details>
+    <summary>Will it open my Illustrator files?</summary>
+    <p>Yes: .ai files saved with Illustrator's default “PDF Compatible” option (most of them), Illustrator EPS files (Adobe Stock downloads are these, even when they end in .ai) and .ai files from Photopea. They come in with artboards, layers, groups, clipping masks, text and images. Gradients, meshes, blend modes and effects don't come across yet. Fonts you don't have installed keep their look until you edit the text.</p>
+  </details>
+  <details>
+    <summary>Can I send work back to someone who uses Illustrator?</summary>
+    <p><span class="path">File <span class="arrow">→</span> Export as Illustrator (.ai)</span> writes the same kind of .ai Illustrator saves by default, with layers and editable text. SVG and PNG export are there too.</p>
+  </details>
+  <details>
+    <summary>How do I get a newer version?</summary>
+    <p>Download and install it the same way. It replaces the old one.</p>
+  </details>
+  <details>
+    <summary>How do I uninstall it?</summary>
+    <p><b>Windows:</b> Settings → Apps → Installed apps → Nous Halo → Uninstall. <b>Mac:</b> drag Nous Halo from Applications to the Trash. <b>Linux:</b> remove “nous-halo” in Software Manager, or <code>sudo apt remove nous-halo</code>.</p>
+  </details>
+</section>
+
+<footer>
+  Nous Halo is free and open source (<a href="https://github.com/lionthroat/NousHalo/blob/main/LICENSE">AGPL-3.0 License</a>) ·
+  <a href="https://nouspdf.lionthroat.com">Nous PDF</a> ·
+  <a href="https://nousatlas.lionthroat.com">Nous Atlas</a> ·
+  <a href="https://github.com/lionthroat/NousHalo">Source code</a> ·
+  <a href="https://github.com/lionthroat/NousHalo/releases/latest">All downloads</a>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var ua = navigator.userAgent || "";
+  var platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "";
+  var touchMac = /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;          // iPadOS says "Macintosh"
+  var phone = /Android|iPhone|iPad|iPod|Mobile/i.test(ua) || touchMac;
+  var mac = !phone && /Mac/i.test(platform + " " + ua);
+  var linux = !phone && !mac && /Linux|X11|CrOS/i.test(platform + " " + ua) && !/Android/i.test(ua);
+  if (phone) document.body.classList.add("is-phone");
+
+  // Tabs
+  var names = ["win", "mac", "linux"];
+  var tabs = names.map(function (n) { return document.getElementById("tab-" + n); });
+  function show(which) {
+    tabs.forEach(function (t) {
+      var on = t.id === "tab-" + which;
+      t.setAttribute("aria-selected", on ? "true" : "false");
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+    });
+    document.querySelectorAll("[data-mod]").forEach(function (el) {
+      el.textContent = which === "mac" ? "⌘" : "Ctrl";
+    });
+    document.querySelectorAll(".use .key").forEach(function (el) {
+      if (el.textContent === "Delete" && which === "mac") el.textContent = "Delete ⌫";
+      if (el.textContent === "Delete ⌫" && which !== "mac") el.textContent = "Delete";
+    });
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener("click", function () { show(names[i]); });
+    t.addEventListener("keydown", function (e) {
+      var step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+      if (step) {
+        var j = (i + step + tabs.length) % tabs.length;
+        tabs[j].focus(); show(names[j]);
+      }
+    });
+  });
+  show(mac ? "mac" : linux ? "linux" : "win");
+
+  // Copy buttons
+  document.querySelectorAll("[data-copy]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var text = document.getElementById(b.getAttribute("data-copy")).textContent;
+      try {
+        navigator.clipboard.writeText(text).then(function () {
+          b.textContent = "Copied!"; setTimeout(function () { b.textContent = "Copy"; }, 1800);
+        });
+      } catch (e) {}
+    });
+  });
+
+  // Version and download sizes from the latest release (optional; the page works without it)
+  fetch("https://api.github.com/repos/lionthroat/NousHalo/releases/latest")
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (rel) {
+      if (!rel || !rel.assets) return;
+      document.querySelectorAll("[data-release-meta]").forEach(function (el) {
+        var name = el.getAttribute("data-release-meta");
+        var a = rel.assets.filter(function (x) { return x.name === name; })[0];
+        if (!a) return;
+        var mb = Math.round(a.size / 1048576);
+        el.textContent = el.textContent + " · version " + rel.tag_name.replace(/^v/, "") + " · " + mb + " MB";
+      });
+    })
+    .catch(function () {});
+})();
+</script>
+</body>
+</html>

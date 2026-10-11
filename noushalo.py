@@ -3,7 +3,7 @@ a colour wheel for hue shifting, palette locking, and frame animation."""
 import os
 import sys
 
-from PySide6.QtCore import QByteArray, QSettings, QSize, Qt, QTimer
+from PySide6.QtCore import QByteArray, QEvent, QSettings, QSize, Qt, QTimer
 from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QKeySequence, QPalette
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
                                QDockWidget, QDoubleSpinBox, QFileDialog, QFormLayout, QHBoxLayout,
@@ -805,15 +805,35 @@ def apply_theme(app):
                       "QToolTip{border:1px solid #4c566a}")
 
 
+class HaloApp(QApplication):
+    """On macOS a file opened from Finder (double-click, Open With, drag onto
+    the Dock icon) arrives as a FileOpen event rather than an argument."""
+    window = None
+    pending = None
+
+    def event(self, e):
+        if e.type() == QEvent.FileOpen and e.file():
+            if self.window is not None:
+                self.window.open_path(e.file())
+                self.window.raise_()
+                self.window.activateWindow()
+            else:
+                self.pending = e.file()
+            return True
+        return super().event(e)
+
+
 def main():
-    app = QApplication(sys.argv)
+    app = HaloApp(sys.argv)
     app.setApplicationName(APP)
     app.setOrganizationName("NousHalo")
     apply_theme(app)
     w = MainWindow()
+    app.window = w
     w.show()
-    if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
-        QTimer.singleShot(50, lambda: w.open_path(sys.argv[1], ask=False))
+    start = sys.argv[1] if len(sys.argv) > 1 and os.path.exists(sys.argv[1]) else app.pending
+    if start:
+        QTimer.singleShot(50, lambda: w.open_path(start, ask=False))
     return app.exec()
 
 

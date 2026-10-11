@@ -43,6 +43,16 @@ def fixtures(kind=None):
     return out
 
 
+def sample_or_fixture(kind="pdf"):
+    """A private fixture when there is one, else the public CI sample."""
+    names = fixtures(kind)
+    if names:
+        return fixture(names[0])
+    dst = os.path.join(TMP, "ci-sample.ai")
+    shutil.copy(os.path.join(ROOT, "tests", "ci-sample.ai"), dst)
+    return dst
+
+
 def fixture(name):
     """A throwaway copy, so tests never touch even the fixture."""
     dst = os.path.join(TMP, name)

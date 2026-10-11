@@ -1,0 +1,16 @@
+// The download page at https://noushalo.lionthroat.com: a static-files-only
+// Cloudflare Worker. Deploy from this folder:  npx wrangler@4 deploy
+// Preview locally:                              npx wrangler@4 dev
+{
+  "name": "noushalo-site",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    { "pattern": "noushalo.lionthroat.com", "custom_domain": true }
+  ],
+  "workers_dev": false,
+  "preview_urls": false
+}

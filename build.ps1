@@ -1,4 +1,5 @@
-# Builds dist\NousHalo\NousHalo.exe. Run from anywhere:
+# Builds dist\NousHalo\NousHalo.exe, and installer-output\NousHalo-Setup.exe if
+# Inno Setup 6 is installed. Run from anywhere:
 #   powershell -ExecutionPolicy Bypass -File build.ps1
 $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
@@ -40,3 +41,14 @@ $drop = @("opengl32sw.dll", "Qt6Quick*.dll", "Qt6Qml*.dll", "Qt6Pdf*.dll", "Qt6N
 foreach ($d in $drop) { Remove-Item (Join-Path $qt $d) -Recurse -Force -ErrorAction SilentlyContinue }
 $mb = (Get-ChildItem (Join-Path $root "dist\NousHalo") -Recurse -File | Measure-Object Length -Sum).Sum / 1MB
 Write-Host ("Built: {0} (version {1}, {2:N0} MB)" -f (Join-Path $root 'dist\NousHalo\NousHalo.exe'), $version, $mb)
+
+# The installer, if Inno Setup 6 is around
+$iscc = @("${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe", "$env:ProgramFiles\Inno Setup 6\ISCC.exe",
+          "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1
+if ($iscc) {
+    & $iscc /Q (Join-Path $root "installer.iss")
+    if ($LASTEXITCODE -ne 0) { throw "Inno Setup failed" }
+    Write-Host "Built: $(Join-Path $root 'installer-output\NousHalo-Setup.exe')"
+} else {
+    Write-Host "(Inno Setup 6 not found, so no installer; GitHub builds it on version tags)"
+}
