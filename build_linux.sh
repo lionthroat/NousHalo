@@ -14,8 +14,10 @@ PY=.venv/bin/python
 VERSION=$(tr -d '[:space:]' < VERSION)
 PKG=nous-halo
 
-# --strip drops debug symbols (libpython alone goes from 32 MB to a few)
-"$PY" -m PyInstaller --noconfirm --clean --windowed --name NousHalo --strip \
+# No --strip: it breaks libraries that pip wheels ship pre-patched (numpy's
+# OpenBLAS fails with "ELF load command ... not page-aligned"). libpython,
+# the one big win (32 MB to a few), is stripped by hand below.
+"$PY" -m PyInstaller --noconfirm --clean --windowed --name NousHalo \
     --add-data "$PWD/icon.ico:." --add-data "$PWD/VERSION:." --add-data "$PWD/assets:assets" \
     --distpath dist --workpath build --specpath build \
     --exclude-module PySide6.QtNetwork --exclude-module PySide6.QtQml \
@@ -42,6 +44,7 @@ find "$QT/plugins/imageformats" -type f ! -name libqico.so ! -name libqjpeg.so !
 # (they're in Depends below): smaller, and an old bundled GLib or C++ runtime
 # can clash with a newer system's GTK modules or graphics drivers.
 find "$INT" -maxdepth 1 -name 'lib*.so*' ! -name 'libpython3*' -delete
+find "$INT" -maxdepth 1 -name 'libpython3*.so*' -exec strip --strip-debug {} +
 
 # Nothing left behind may need something that was just deleted
 MISSING=$(find dist/NousHalo -type f \( -name '*.so*' -o -name NousHalo \) -print0 |
