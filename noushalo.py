@@ -221,6 +221,7 @@ class MainWindow(QMainWindow):
         act(m, "Flip vertical", lambda: self.ed.flip(False))
         m.addSeparator()
         act(m, "Text to outlines", self.ed.text_to_outlines, "Ctrl+Shift+O")
+        act(m, "Image Trace…", self.image_trace, "Ctrl+Alt+T")
         act(m, "Rasterize", self.ed.rasterize_selection)
         m.addSeparator()
         act(m, "New layer", lambda: self.ed.new_layer(), "Ctrl+L")
@@ -380,6 +381,22 @@ class MainWindow(QMainWindow):
             self.ed.notify("doc")
         self.ed.fill, self.ed.stroke = s, f
         self.ed.changed.emit("tool")
+
+    def image_trace(self):
+        from halo_model import RasterItem
+        from halo_tracedlg import TraceDialog
+        rasters = [it for it in self.ed.selected_leaves() if isinstance(it, RasterItem)]
+        if not rasters:
+            self.statusBar().showMessage("Select a placed image or paint object to trace (File → Place image…)", 6000)
+            return
+        dlg = TraceDialog(self.ed, rasters[-1], self.color_choices, self)
+        dlg.resize(1100, 680)
+        if dlg.exec() == QDialog.Accepted:
+            g = dlg.run()
+            if g is None:
+                self.statusBar().showMessage("Nothing to trace at that threshold", 6000)
+            else:
+                self.statusBar().showMessage("Traced %d shapes into “%s”" % (len(g.children), g.name), 6000)
 
     def make_clip(self):
         if self.ed.make_clipping_mask() is None:

@@ -101,6 +101,14 @@ reaches any path at any depth. Ctrl+7 / Ctrl+Alt+7 make and release clipping
 masks. In the Layers panel, groups and sublayers nest with thumbnails; drag
 objects onto a group or layer row to move them in.
 
+**Image Trace** (Object → Image Trace…, Ctrl+Alt+T): select a placed scan
+or paint object and it becomes filled vector shapes that follow the ink's
+edges, holes included, the way Illustrator traces line art. Set the threshold
+(automatic by default), ignore specks under a size, smoothness and how sharp
+corners stay, and the fill colour (palette-aware); a live preview shows the
+result. The traced shapes arrive as a group above the image, which is hidden,
+not deleted.
+
 Rulers (Ctrl+R) measure from the current artboard's corner. Drag out of a
 ruler to make a guide, drag a guide to move it or back onto the ruler to delete
 it, double-click one to type its position. Shapes, the pen, moved objects and
