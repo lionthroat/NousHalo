@@ -1,0 +1,10 @@
+tests/fixtures/
+tests/out/
+.venv/
+build/
+dist/
+__pycache__/
+installer-output/
+*.saving
+.wrangler/
+site/.wrangler/
