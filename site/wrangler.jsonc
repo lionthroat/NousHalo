@@ -1,12 +1,17 @@
-// The download page at https://noushalo.lionthroat.com: a static-files-only
-// Cloudflare Worker. Deploy from this folder:  npx wrangler@4 deploy
-// Preview locally:                              npx wrangler@4 dev
+// The download page at https://noushalo.lionthroat.com: static files behind a tiny Worker
+// (src/worker.js) that sends http visits to https.
+// Deploy from this folder:  npx wrangler@4 deploy
+// Preview locally:          npx wrangler@4 dev
 {
   "name": "noushalo-site",
   "compatibility_date": "2026-09-01",
+  "main": "src/worker.js",
   "assets": {
     "directory": "./public",
-    "not_found_handling": "404-page"
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    // the Worker sees every request first, so http ones can be redirected
+    "run_worker_first": true
   },
   "routes": [
     { "pattern": "noushalo.lionthroat.com", "custom_domain": true }
